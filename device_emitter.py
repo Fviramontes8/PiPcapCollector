@@ -15,12 +15,12 @@ def device_upload(ip_addr, mac_addr):
     pi_upload = [key, mac_addr, ip_addr]
     db.writeDeviceData("ip", pi_upload)
     db.disconnect()
-    
+
 def device_delete(mac_addr, table_name):
     db.connect()
     db.deleteData(mac_addr, table_name)
     db.disconnect()
-    
+
 
 db = dc.DatabaseConnect()
 db.connect()
