@@ -11,5 +11,9 @@ if [ -f /root/PiPcapCollector/mac.txt ];then
 rm mac.txt
 fi
 cat /sys/class/net/eth0/address >> mac.txt
+if [ -f /root/PiPcapCollector/date.txt ];then
+rm date.txt
+fi
+date +%u >> date.txt
 
 python device_emitter.py
