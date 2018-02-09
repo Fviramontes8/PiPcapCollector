@@ -39,13 +39,13 @@ ip_address = text_object.read()
 text_object.close()
 ip_address = ip_address.strip("\n")
 ip_address = ip_address.strip()
-#print("This computer's IP address: " + ip_address)
+print("This computer's IP address: '" + ip_address+"'")
 
 text_object = open("mac.txt", "r")
 mac_address = text_object.read()
 text_object.close()
 mac_address = mac_address.strip("\n")
-#print("This computer's MAC address: " + mac_address)
+print("This computer's MAC address: '" + mac_address+"'")
 
 for pi_iterator in range(len(pi_details)):
     database_ip = pi_details[pi_iterator+1][1]

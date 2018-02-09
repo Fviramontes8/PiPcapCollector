@@ -1,5 +1,5 @@
 #!/bin/bash
-sleep 1m
+sleep 120s
 cd PiPcapCollector
 if [ -f /root/PiPcapCollector/ip.txt ];then
 #cd PiPcapCollector
