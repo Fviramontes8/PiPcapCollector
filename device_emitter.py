@@ -53,11 +53,6 @@ text_object.close()
 date=date.strip("\n")
 #print("'"+date+"'")
 
-import subprocess
-subprocess.call(["./parser5"])
-print("Hello, hello, hello")
-
-'''
 for pi_iterator in range(len(pi_details)):
     database_ip = pi_details[pi_iterator+1][1]
     #print("Database: " + database_ip)
@@ -88,4 +83,7 @@ if(ip_check):
 if(mac_check):
     #print("This device is not on the database!")
     device_upload(ip_address, mac_address)
-'''
+
+import subprocess
+subprocess.call(["./parser5"])
+print("Hello, hello, hello")
