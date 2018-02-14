@@ -16,4 +16,4 @@ rm date.txt
 fi
 date +%u >> date.txt
 
-#python device_emitter.py
+python device_emitter.py

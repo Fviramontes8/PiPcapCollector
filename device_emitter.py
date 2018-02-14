@@ -86,4 +86,3 @@ if(mac_check):
 
 import subprocess
 subprocess.call(["./parser5"])
-print("Hello, hello, hello")

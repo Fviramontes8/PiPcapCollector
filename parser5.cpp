@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
 	
 	//The string path is to go to the selected path to parse pcap files
 	/******************************************************************/
-	const std::string path("/root/PiPcapCollector/Wack/");
+	const std::string path("/root/PiPcapCollector/data/");
 	/******************************************************************/
 	
 	//Iterator to iterate throught the chosen path above
