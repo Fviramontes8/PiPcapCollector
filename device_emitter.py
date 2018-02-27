@@ -84,5 +84,6 @@ if(mac_check):
     #print("This device is not on the database!")
     device_upload(ip_address, mac_address)
 
-import subprocess
-subprocess.call(["./parser5"])
+print(date)
+#import subprocess
+#subprocess.call(["./parser5"])
