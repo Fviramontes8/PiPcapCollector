@@ -85,5 +85,7 @@ if(mac_check):
     device_upload(ip_address, mac_address)
 
 print(date)
-#import subprocess
+
+import subprocess
+if date == 0:
 #subprocess.call(["./parser5"])
