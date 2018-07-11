@@ -4,7 +4,7 @@
 
 int main(int argc, char* argv[]) {
 	
-	std::string table_name = "sun";
+	std::string table_name = "tues";
 	
 	//Opening connection with database
 	DatabaseConnect db("postgres", "129.24.26.110", "postgres", "Cerculsihr4T");
