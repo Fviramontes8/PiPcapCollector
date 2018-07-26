@@ -21,7 +21,7 @@ using namespace Tins;
 
 int main(int argc, char* argv[]) {
 	//Opening connection with database
-	DatabaseConnect db("postgres", "129.24.26.110", "postgres", "Cerculsihr4T");
+	DatabaseConnect db("postgres", "18.221.41.211", "postgres", "Cerculsihr4T");
 	db.connect();
 	
 	//Declaring table name to write to
