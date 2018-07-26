@@ -1,0 +1,2 @@
+#!/bin/bash
+pkill parser5_sun
