@@ -1,10 +1,26 @@
 /**
- * Author: Francisco Viramontes
+ * @file parser5.cpp
+ * @author Francisco Viramontes
  * 
- * Description: TBD
+ * Description: This is a pcap parser that reads pcap files from a 
+ * 	specified directory (specified by std::string path) and reads
+ * 	statistics like number of users, bits sent over the network,
+ * 	and fits them into a vector that represents the statistical
+ * 	analysis for that second. 
  * 
- * TO COMPILE: g++ parser5_x.cpp DatabaseConnect.cpp -ltins -lboost_system -lboost_filesystem -lpq -o *executable_name*
- * TO CAPTURE DATA: tshark -i <<WiFi Interface>> -I -a duration:60 -b duration:1 -w data.pcap
+ * Input: At least one pcap file in the folder specified in 
+ * 	std::string path. THE PCAP FILE MUST BE SNIFFED VIA WIRELESS
+ * 	NOT ETHERNET! THE PROGRAM WILL NOT WORK!
+ * 
+ * Output: A few statements printed on terminal, specifying the status
+ * 	of the interaction with the PostgreSQL database. Uploads a row
+ * 	of sql data to the PostgreSQL database. Details of the row follow
+ * 	as such:
+ * 		Timestamp, Number of Users, Total Bits, Total Packets, 
+ * 		Avg Signal Strength, Avg Data Rate, 802.11a Bits, 802.11n bits
+ * 
+ * TO COMPILE: g++ parser5.cpp DatabaseConnect.cpp -ltins -lboost_system -lboost_filesystem -lpq -o *executable_name*
+ * TO CAPTURE DATA: tshark -i *WiFi Interface* -I -a duration:60 -b duration:1 -w data.pcap
  * *!*!*!*!*!*!*MAKE SURE YOUR WIRELESS INTERFACE IS IN MONITOR MODE*!*!*!*!*!*!*!*!
  */
 #include <iostream>
@@ -20,18 +36,24 @@
 using namespace Tins;
 
 int main(int argc, char* argv[]) {
+	/**
+	 * This is a pcap parser that reads pcap files from a 
+	 * 	specified directory (specified by std::string path) and reads
+	 * 	statistics like number of users, bits sent over the network,
+	 * 	and fits them into a std::vector array that represents the statistical
+	 * 	analysis for that second. 
+	 */
 	//Opening connection with database
 	DatabaseConnect db("postgres", "18.221.41.211", "postgres", "Cerculsihr4T");
 	db.connect();
 	
-	//Declaring table name to write to
-	std::string table_name = "5pi_wed3";
+	std::string table_name;///Declaring table name to write to
+	table_name  = "5pi_wed3";
 	
 	//Getting the most recent key from database table
 	int z = db.getNextKey(table_name);
 	
-	//Creating a local cache of recent files parsed so that we don't re-parse a pcap file
-	std::vector<std::string> recentFiles;
+	std::vector<std::string> recentFiles;///Creates a local cache of recent files parsed so that we don't re-parse a pcap file
 	
 	//If the parser waits for too long we want to set an exit condition
 	int wait_count = 0;
@@ -40,9 +62,8 @@ int main(int argc, char* argv[]) {
 	int loopbreak = 1;
 	int breakout = 0;
 	
-	//The string path is to go to the selected path to parse pcap files
 	/******************************************************************/
-	const std::string path("/root/PiPcapCollector/data/wed");
+	const std::string path("/root/Pkt_data/wed/");///The string path is to go to the selected path to parse pcap files
 	/******************************************************************/
 	
 	//Iterator to iterate throught the chosen path above
@@ -61,11 +82,11 @@ int main(int argc, char* argv[]) {
 			int ts;
 			
 			/* Vector of integers that keeps track of these characteristics:
-			 * Timestamp, Number of Unique Users, Total Bits sent,
-			 * Number of Packets sent, Average Signal Strength, Average 
-			 * Data Rate, Bits of 802.11
+			 *Vector contains these features: Timestamp, Number of Unique Users, 
+			 *Total Bits sent, Number of Packets sent, Average Signal Strength, 
+			 *Average Data Rate, 802.11a bits, 802.11n bits
 			 */
-			std::vector<int> statVect = {0,0,0,0,0,0,0,0,0};
+			std::vector<int> statVect = {0,0,0,0,0,0,0,0};
 			
 			//Vector for determining unique MAC addresses
 			std::vector<std::string> uniqueMAC;
@@ -160,9 +181,9 @@ int main(int argc, char* argv[]) {
 							
 							//Determining the channel
 							if((radiotap.present() & RadioTap::CHANNEL) != 0) {
-								/**
+								/*
 								 * 0x140 = 320 -> 802.11a and 802.11n using data rate to separate
-								 **/
+								 */
 								
 								//We take the channel flag and get details on frequency and channel
 								cFlags = radiotap.channel_type();
@@ -198,6 +219,7 @@ int main(int argc, char* argv[]) {
 							uniqueMAC.push_back(M_src);
 							uniqueMAC.push_back(M_dst);
 						}
+						
 						//The case of initializing the vector by encountering 
 						// the special packet with only a destination MAC address
 						else if((uniqueMAC.empty()) & (M_src == "None")){
@@ -207,6 +229,7 @@ int main(int argc, char* argv[]) {
 						else if(M_src == "None") {
 							;
 						}
+						
 						//The case of adding to the vector once we encounter 
 						// other unique MAC addresses
 						else{
@@ -244,7 +267,7 @@ int main(int argc, char* argv[]) {
 						}
 						else {
 							//std::cout << "802.11n" << std::endl << std::endl;
-							statVect[8] += pdu.size();
+							statVect[7] += pdu.size();
 						}
 						
 					}
@@ -254,7 +277,7 @@ int main(int argc, char* argv[]) {
 					}
 					*/
 					
-					/**Update this**/
+					/*Update this*/
 					
 					//Timestamp of the last packet
 					statVect[0] = ts;
@@ -269,11 +292,11 @@ int main(int argc, char* argv[]) {
 					//std::cout << "Number of users " << statVect[1] << std::endl;
 					
 					//String vector to upload the data to the database
-					std::vector<std::string> stringVect(9);
-					for(int i = 0; i < 9; i++) {
+					std::vector<std::string> stringVect(8);
+					for(int i = 0; i < 8; i++) {
 						stringVect[i] = std::to_string(statVect[i]);
 					}
-					/*
+					/* //To see contents of the Vector
 					std::cout << std::endl;
 					for(auto& stat: statVect) {
 						std::cout << stat << std::endl;
@@ -283,10 +306,10 @@ int main(int argc, char* argv[]) {
 					//Only write to database if there is user activity in the pcap file
 					if(statVect[1] > 0) {
 						//Creates table with the name as the variable t_name
-						//db.makeTable("");
+						//db.makeTable5GHz("");
 						std::string keyString = std::to_string(z);
 						//First input to choose table to write to, second the vector of data
-						db.writeData(table_name, keyString, stringVect);
+						db.writeData5GHz(table_name, keyString, stringVect);
 						std::cout << "Wrote to table" << std::endl;
 						z++;
 						std::cout << std::endl;
@@ -295,7 +318,7 @@ int main(int argc, char* argv[]) {
 						std::cout << statVect[1] << std::endl;
 					}
 				}
-			/**Delete pcap file**/
+			/*Delete pcap file*/
 			std::string del = i->path().string();
 			std::cout << del << std::endl;
 			usleep(750000);
@@ -309,6 +332,7 @@ int main(int argc, char* argv[]) {
 			}
 			}
 		}
+	//Need to wait for tshark to write more pcap files
 	usleep(1000100);
 	//loopbreak = 0;
 	}
