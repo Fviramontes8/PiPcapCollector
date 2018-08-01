@@ -1,16 +1,21 @@
 /***********************************************************************
- * Author: Seth Decker, Francisco Viramontes
+ * @file DatabaseConnect.cpp
+ * @author Seth Decker, Francisco Viramontes
+ * 
+ * @brief Contains functions to interact with PostgreSQL database
  * 
  * Description: This program is intended to  act as a front to 
  * comunicate with an sql database via c++ code. Inputs vary and
  * the user should see each function for their inputs and outputs.
+ * It only contains functions.
  * 
  **********************************************************************/
 #include "DatabaseConnect.hpp"
 #include <string>
 #include <vector>
 
-/*/Initializes variables to connect to PostgreSQL database
+//Initializes variables to connect to PostgreSQL database
+/*
 DatabaseConnect::DatabaseConnect()
 {
 	databasename = "postgres";
@@ -20,7 +25,7 @@ DatabaseConnect::DatabaseConnect()
 	
 }*/
 
-//Function to save variables to log on to the database
+///Declares variables to log on to the database
 DatabaseConnect::DatabaseConnect(std::string _databasename, std::string _host, std::string _username, std::string _password)
 {
 	databasename = _databasename;
@@ -30,7 +35,7 @@ DatabaseConnect::DatabaseConnect(std::string _databasename, std::string _host, s
 	
 }
 
-//Function to log on to the database and then to check the integrity of the connection
+///Uses the credentials initialzed by DatabaseConnect::DatabaseConnect() to login into the database and then to check the integrity of the connection
 int DatabaseConnect::connect()
 {
 	std::string conninfo =  "dbname=" + databasename + " " + " host=" + host + " " + " user=" + username + " " + " password=" + password;
@@ -48,122 +53,128 @@ int DatabaseConnect::connect()
 	return 0;
 }
 
-int DatabaseConnect::deleteTableContent(std::string v) {
-	std::string u = "DELETE FROM " + v;
-	PQexec(conn, u.c_str());
+///Deletes table off of PostgreSQL database that is specified by table_name
+int DatabaseConnect::deleteTableContent(std::string table_name) {
+	std::string sql_query = "DELETE FROM " + table_name;
+	PQexec(conn, sql_query.c_str());
+	PQclear(PQexec(conn, sql_query.c_str()));
 	return 0;
 }
 
 
-/*Given a string input this function will make a table under the name of
- * the input string. It will have these columns (all integers):
+/**
+ * @brief Given a string input this function will make a table under the name of the input string. 
  * 
- * Key
- * Timestamp
- * Number of Users
- * Bits
- * Number of Packets
- * Average signal strength
- * Average data rate
- * Percentage of 802.11b packets
- * Percentage of 802.11g packets
- * Percentage of 802.11n packets
+ * It will have these columns (all integers):
  * 
- * Return a print statement saying that the table was made.
+ * Key,
+ * Timestamp,
+ * Number of Users,
+ * Bits,
+ * Number of Packets,
+ * Average signal strength,
+ * Average data rate,
+ * Bits sent via 802.11b,
+ * Bits sent via 802.11g,
+ * Bits sent via 802.11n
+ * 
+ * Returns a print statement saying that the table was made.
  */
-int DatabaseConnect::makeTable(std::string s) {
-	std::string k = "Create Table "+ s +"(Key int PRIMARY KEY, ts int, NoU int, bits int, pkt_num int, sigS int, dR int, phyb int, phyg int, phyn int)";
-	PQexec(conn, k.c_str());
-	std::cout << "Made table: " << s << std::endl;
+int DatabaseConnect::makeTable2GHz(std::string table_name) {
+	std::string sql_query = "Create Table "+ table_name +"(Key int PRIMARY KEY, ts int, NoU int, bits int, pkt_num int, sigS int, dR int, phyb int, phyg int, phyn int)";
+	PQexec(conn, sql_query.c_str());
+	std::cout << "Made table: " << table_name << std::endl;
+	//To avoid memory leakage
+	PQclear(PQexec(conn, sql_query.c_str()));
 	return 0;
 }
 
-int DatabaseConnect::makeIPTable(std::string s) {
-	std::string t = "Create Table " + s + "(Key int PRIMARY KEY, mac VARCHAR(20), ip VARCHAR(20))";
-	PQexec(conn, t.c_str());
-	std::cout << "Made IP table" << std::endl;
+/**
+ * @brief Given a string input this function will make a table under the name of the input string. 
+ * 
+ * It will have these columns (all integers):
+ * 
+ * Key,
+ * Timestamp,
+ * Number of Users,
+ * Bits,
+ * Number of Packets,
+ * Average signal strength,
+ * Average data rate,
+ * Bits sent via 802.11a,
+ * Bits sent via 802.11n
+ * 
+ * Returns a print statement saying that the table was made.
+ */
+int DatabaseConnect::makeTable5GHz(std::string table_name) {
+	std::string sql_query = "Create Table "+ table_name +"(Key int PRIMARY KEY, ts int, NoU int, bits int, pkt_num int, sigS int, dR int, phya int, phyn int)";
+	PQexec(conn, sql_query.c_str());
+	std::cout << "Made table: " << table_name << std::endl;
+	//To avoid memory leakage
+	PQclear(PQexec(conn, sql_query.c_str()));
 	return 0;
 }
 
-/*These two lines grab the highest key from the database (if it is 
-	 * empty, 0) then adds one so that we can add more data to the 
-	 * database.
-	 */
-int DatabaseConnect::getNextKey(std::string s) {
-	std::string query = "select * from " + s;
-	int k = PQntuples(PQexec(conn, query.c_str())) + 1;
-	return k;
+/**Grabs the highest key from the database (if it is 
+* empty, 0) then adds one so that we can add more data to the 
+* database.
+*/
+int DatabaseConnect::getNextKey(std::string key) {
+	std::string query = "select * from " + key;
+	int next_key = PQntuples(PQexec(conn, query.c_str())) + 1;
+	return next_key;
 }
 
-/*This function takes a string and a vector of 9 "int" elements 
+/**The input takes a string and a vector of 9 "int" elements 
  * (converted to strings) as an input and writes the data from the
  * vector to a database of name of the string given. If there is there
  * is any data in the database beforehand, it will add to the database
  * without overriding the data that was there before.
+ * Example:
+ * std::vector<std::string> data;
+ * data = ["1525368933", "45", "5682987", "61", "-76", "12", "87654",
+ *           "6842", "4814587"];
+ * writeData2GHz("table_name", "5", data);
  */
-int DatabaseConnect::writeData(std::string table_name, std::string k, std::vector<std::string> p)
+int DatabaseConnect::writeData2GHz(std::string table_name, std::string key, std::vector<std::string> data)
 { 
 	//String to write to database in sql syntax
-	std::string sql_command = "INSERT INTO "+ table_name +" (Key, ts, NoU, bits, pkt_num, sigS, dR, phyb, phyg, phyn) VALUES('"+ k +"', '"+ p[0] +"', '"+ p[1] +"', '"+ p[2] +"', '"+ p[3] +"', '"+ p[4] +"', '"+ p[5] +"', '"+ p[6] +"', '"+ p[7] +"', '"+ p[8] +"')";
+	std::string sql_query = "INSERT INTO "+ table_name +" (Key, ts, NoU, bits, pkt_num, sigS, dR, phyb, phyg, phyn) VALUES('"+key+"', '"+data[0]+"', '"+data[1]+"', '"+data[2]+"', '"+data[3]+"', '"+data[4]+"', '"+data[5]+"', '"+data[6]+"', '"+data[7]+"', '"+data[8]+"')";
 	
 	//Executes command to write to database
-	PQexec(conn, sql_command.c_str());
+	PQexec(conn, sql_query.c_str());
 	std::cout << "Wrote to database" << std::endl;
 	//To avoid memory leakage
-	PQclear(PQexec(conn, sql_command.c_str()));
+	PQclear(PQexec(conn, sql_query.c_str()));
 	return 0;
 }
 
-int DatabaseConnect::writeIPData(std::string table_name, std::string database_key, std::vector<std::string> p) {
-	std::string sql_command = "INSERT INTO "+ table_name +" (Key, mac, ip) VALUES('"+database_key+"', '"+p[0]+"' ,'"+p[1]+"')";
-	//PQexec(conn, command.c_str());
-	std::cout << PQresultErrorMessage(PQexec(conn, sql_command.c_str())) << std::endl;
-	//std::cout << "Wrote to database" << std::endl;
-	PQclear(PQexec(conn, sql_command.c_str()));
+/**The input takes a string and a vector of 8 "int" elements 
+ * (converted to strings) as an input and writes the data from the
+ * vector to a database of name of the string given. If there is there
+ * is any data in the database beforehand, it will add to the database
+ * without overriding the data that was there before.
+ * Example:
+ * std::vector<std::string> data;
+ * data = ["1525368933", "45", "5682987", "61", "-76", "12", "87654",
+ *           "4814587"];
+ * writeData5GHz("table_name", "5", data);
+ */
+int DatabaseConnect::writeData5GHz(std::string table_name, std::string key, std::vector<std::string> data)
+{ 
+	//String to write to database in sql syntax
+	std::string sql_query = "INSERT INTO "+ table_name +" (Key, ts, NoU, bits, pkt_num, sigS, dR, phya, phyn) VALUES('"+key+"', '"+data[0]+"', '"+data[1]+"', '"+data[2]+"', '"+data[3]+"', '"+data[4]+"', '"+data[5]+"', '"+data[6]+"', '"+data[7]+"')";
+	
+	//Executes command to write to database
+	PQexec(conn, sql_query.c_str());
+	std::cout << "Wrote to database" << std::endl;
+	//To avoid memory leakage
+	PQclear(PQexec(conn, sql_query.c_str()));
 	return 0;
 }
-/**IN PROGRESS**/
-std::string DatabaseConnect::searchMAC(std::string table_name, std::string mac_addr) {
-	PGresult *res;
-	std::cout << "About to search for MAC address" << std::endl;
-	/*
-	std::string sql_declaration = "DECLARE macboi VARCHAR(20);";
-	res = PQexec(conn, sql_declaration.c_str());
-	if(PQresultStatus(res) != PGRES_TUPLES_OK) {
-		std::cout << "Could not fetch all" << std::endl;
-		std::cout << PQresultErrorMessage(res) << std::endl;
-		PQclear(res);
-	}
-	PQclear(res);
-	
-	std::string sql_variable_initialization = "SET macboi = '"+mac_addr+"';";
-	res = PQexec(conn, sql_variable_initialization.c_str());
-	if(PQresultStatus(res) != PGRES_TUPLES_OK) {
-		std::cout << "Could not fetch all" << std::endl;
-		std::cout << PQresultErrorMessage(res) << std::endl;
-		PQclear(res);
-	}
-	PQclear(res);
-	*/
-	//std::string sql_command = "SELECT * FROM "+table_name+" WHERE CONTAINS(mac, CAST('"+mac_addr+"' AS varchar(20)))";
-	std::string sql_command = "SELECT * FROM "+table_name+" WHERE CONTAINS(ip,('"+mac_addr+"')::regconfig)";
-	res = PQexec(conn, sql_command.c_str());
-	if(PQresultStatus(res) != PGRES_TUPLES_OK) {
-		std::cout << "Could not fetch all" << std::endl;
-		std::cout << PQresultErrorMessage(res) << std::endl;
-		PQclear(res);
-	}
-	int nFields = PQnfields(res);
-	
-	std::string sql_answer = "yes";
-	std::cout << nFields << std::endl;
-	//std::cout << PQfnumber(res, mac_addr.c_str()) << std::endl;
-	//std::cout << PQfname(res, -1) << std::endl;
-	//std::string sql_answer = PQexecParams(conn, sql_command.c_str(), 0, NULL, );
-	return sql_answer;
-}
 
-//Disconnects from database
+
+///Disconnects from the PostgreSQL database and prints out 'Disconnected'
 int DatabaseConnect::disconnect() {
 	PQfinish(conn);
 	std::cout << "Disconnected" << std::endl;
