@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#Installing necessary packages
+sudo apt-get install libtins-dev libpcap-dev libssl-dev libboost-all-dev libpq-dev
+
 echo "Compiling parsers..."
 g++ parser5_sun.cpp DatabaseConnect.cpp -ltins -lboost_system -lboost_filesystem -lpq -o parser_sun
 
