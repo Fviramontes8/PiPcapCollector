@@ -19,7 +19,7 @@
 class DatabaseConnect{
 private:
 	PGconn *conn;
-	std::string host = "129.24.26.137";
+	std::string host = "18.221.41.211";
 	std::string password = "Cerculsihr4T";
 	std::string databasename = "postgres";
 	std::string username = "postgres";

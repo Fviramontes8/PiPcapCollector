@@ -15,15 +15,18 @@
 #include <vector>
 
 //Initializes variables to connect to PostgreSQL database
-/*
+
 DatabaseConnect::DatabaseConnect()
 {
+	/*
 	databasename = "postgres";
 	username = "postgres";
 	password = "Cerculsihr4T";
 	host = "129.24.26.137";
+	*/
+	;
 	
-}*/
+}
 
 ///Declares variables to log on to the database
 DatabaseConnect::DatabaseConnect(std::string _databasename, std::string _host, std::string _username, std::string _password)
