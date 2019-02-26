@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 	int breakout = 0;
 	
 	/******************************************************************/
-	const std::string path("/root/Pkt_data/mon/");///The string path is to go to the selected path to parse pcap files
+	const std::string path("/root/PiPcapCollector/data/mon/");///The string path is to go to the selected path to parse pcap files
 	/******************************************************************/
 	
 	//Iterator to iterate throught the chosen path above

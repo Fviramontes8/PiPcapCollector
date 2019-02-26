@@ -1,6 +1,6 @@
 #!/bin/bash
 sleep 120s
-cd PiPcapCollector
+cd ~/PiPcapCollector
 if [ -f /root/PiPcapCollector/ip.txt ];then
 #cd PiPcapCollector
 rm ip.txt

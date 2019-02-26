@@ -12,9 +12,9 @@ g++ parser5_tues.cpp DatabaseConnect.cpp -ltins -lboost_system -lboost_filesyste
 
 g++ parser5_wed.cpp DatabaseConnect.cpp -ltins -lboost_system -lboost_filesystem -lpq -o parser_wed
 
-g++ parser5_thurs.cpp DatabaseConnect.cpp -ltins -lboost_system -lboost_filesystem -lpq -o parser5_thurs
+g++ parser5_thurs.cpp DatabaseConnect.cpp -ltins -lboost_system -lboost_filesystem -lpq -o parser_thurs
 
-g++ parser5_fri.cpp DatabaseConnect.cpp -ltins -lboost_system -lboost_filesystem -lpq -o parser5_fri
+g++ parser5_fri.cpp DatabaseConnect.cpp -ltins -lboost_system -lboost_filesystem -lpq -o parser_fri
 
 g++ parser5_sat.cpp DatabaseConnect.cpp -ltins -lboost_system -lboost_filesystem -lpq -o parser_sat
 

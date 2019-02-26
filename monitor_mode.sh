@@ -1,7 +1,7 @@
 #!/bin/bash
-#PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
-#sleep 90s
+sleep 90s
 pkill NetworkManager
 ifconfig wlan0 down
 iw dev wlan0 del
