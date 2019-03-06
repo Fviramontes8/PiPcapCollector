@@ -19,10 +19,10 @@
 class DatabaseConnect{
 private:
 	PGconn *conn;
-	std::string host = "18.221.41.211";
-	std::string password = "Cerculsihr4T";
-	std::string databasename = "postgres";
-	std::string username = "postgres";
+	std::string host;
+	std::string password;
+	std::string databasename;
+	std::string username;
 
 public:
 	int getNextKey(std::string);///Gets next available key from database

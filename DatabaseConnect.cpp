@@ -13,19 +13,42 @@
 #include "DatabaseConnect.hpp"
 #include <string>
 #include <vector>
+#include <fstream>
 
-//Initializes variables to connect to PostgreSQL database
-
+/**Initializes variables to connect to PostgreSQL database
+* Reads database_config.txt, and example is as follows:
+	127.0.0.1
+	postgres_database_name
+	postgres_user
+	postgres_password
+* Where 127.0.0.1 is binded to host,
+* postgres_database_name is binded to database,
+* postgres_user is binded to username,
+* postgres_password is binded to password.
+*/
 DatabaseConnect::DatabaseConnect()
 {
-	/*
-	databasename = "postgres";
-	username = "postgres";
-	password = "Cerculsihr4T";
-	host = "129.24.26.137";
-	*/
-	;
-	
+	std::ifstream config_file;
+	std::string temp, file_name = "database_config.txt";
+	config_file.open(file_name, std::ifstream::in);
+	if(config_file.is_open()) {
+		getline(config_file, temp);
+		host = temp;
+
+		getline(config_file, temp);
+		databasename = temp;
+
+		getline(config_file, temp);
+		username = temp;
+
+		getline(config_file, temp);
+		password = temp;
+		
+		config_file.close();
+	}
+	else {
+		std::cout << "Cannot open " << file_name << std::endl;
+	}
 }
 
 ///Declares variables to log on to the database
