@@ -64,7 +64,7 @@ DatabaseConnect::DatabaseConnect(std::string _databasename, std::string _host, s
 ///Uses the credentials initialzed by DatabaseConnect::DatabaseConnect() to login into the database and then to check the integrity of the connection
 int DatabaseConnect::connect()
 {
-	std::string conninfo =  "dbname=" + databasename + " " + " host=" + host + " " + " user=" + username + " " + " password=" + password;
+	std::string conninfo =  "dbname=" + databasename + " host=" + host + " user=" + username + " password=" + password;
 	
 	conn = PQconnectdb(conninfo.c_str());
 	
@@ -145,10 +145,21 @@ int DatabaseConnect::makeTable5GHz(std::string table_name) {
 * empty, 0) then adds one so that we can add more data to the 
 * database.
 */
-int DatabaseConnect::getNextKey(std::string key) {
-	std::string query = "select * from " + key;
-	int next_key = PQntuples(PQexec(conn, query.c_str())) + 1;
-	return next_key;
+int DatabaseConnect::getNextKey(std::string table_name) {
+	PGresult *res;
+	int next_key;
+	//std::string query = "select * from " + table_name;
+	//std::string query = "select nextval(pg_get_serial_sequence('"+table_name+"', 'key'))";
+	std::string query = "select max(\"key\") from \""+table_name+"\"";
+	res = PQexec(conn, query.c_str());
+	if(PQresultStatus(res) != PGRES_TUPLES_OK) {
+		fprintf(stderr, "Could not get next key: %s", PQerrorMessage(conn));
+		PQclear(res);
+		return -1;
+	}
+	next_key = atoi(PQgetvalue(res, 0, 0));
+	PQclear(res);
+	return next_key+1;
 }
 
 /**The input takes a string and a vector of 9 "int" elements 
@@ -165,7 +176,7 @@ int DatabaseConnect::getNextKey(std::string key) {
 int DatabaseConnect::writeData2GHz(std::string table_name, std::string key, std::vector<std::string> data)
 { 
 	//String to write to database in sql syntax
-	std::string sql_query = "INSERT INTO "+ table_name +" (Key, ts, NoU, bits, pkt_num, sigS, dR, phyb, phyg, phyn) VALUES('"+key+"', '"+data[0]+"', '"+data[1]+"', '"+data[2]+"', '"+data[3]+"', '"+data[4]+"', '"+data[5]+"', '"+data[6]+"', '"+data[7]+"', '"+data[8]+"')";
+	std::string sql_query = "INSERT INTO \""+ table_name +"\" (Key, ts, NoU, bits, pkt_num, sigS, dR, phyb, phyg, phyn) VALUES('"+key+"', '"+data[0]+"', '"+data[1]+"', '"+data[2]+"', '"+data[3]+"', '"+data[4]+"', '"+data[5]+"', '"+data[6]+"', '"+data[7]+"', '"+data[8]+"')";
 	
 	//Executes command to write to database
 	PQexec(conn, sql_query.c_str());
@@ -188,17 +199,24 @@ int DatabaseConnect::writeData2GHz(std::string table_name, std::string key, std:
  */
 int DatabaseConnect::writeData5GHz(std::string table_name, std::string key, std::vector<std::string> data)
 { 
+	PGresult *res;
 	//String to write to database in sql syntax
-	std::string sql_query = "INSERT INTO "+ table_name +" (Key, ts, NoU, bits, pkt_num, sigS, dR, phya, phyn) VALUES('"+key+"', '"+data[0]+"', '"+data[1]+"', '"+data[2]+"', '"+data[3]+"', '"+data[4]+"', '"+data[5]+"', '"+data[6]+"', '"+data[7]+"')";
-	
+	std::string sql_query = "INSERT INTO \""+ table_name +"\" (Key, ts, NoU, bits, pkt_num, sigS, dR, phya, phyn) VALUES('"+key+"', '"+data[0]+"', '"+data[1]+"', '"+data[2]+"', '"+data[3]+"', '"+data[4]+"', '"+data[5]+"', '"+data[6]+"', '"+data[7]+"')";
+	//std::cout << sql_query << std::endl;
+
 	//Executes command to write to database
-	PQexec(conn, sql_query.c_str());
-	std::cout << "Wrote to database" << std::endl;
+	res = PQexec(conn, sql_query.c_str());
+	if(PQresultStatus(res) != PGRES_COMMAND_OK) {
+		fprintf(stderr, "Could not write to database: %s", PQerrorMessage(conn));
+		PQclear(res);
+		disconnect();
+		return -1;
+	}
+	//std::cout << "Wrote to database" << std::endl;
 	//To avoid memory leakage
-	PQclear(PQexec(conn, sql_query.c_str()));
+	PQclear(res);
 	return 0;
 }
-
 
 ///Disconnects from the PostgreSQL database and prints out 'Disconnected'
 int DatabaseConnect::disconnect() {

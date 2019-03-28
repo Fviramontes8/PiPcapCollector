@@ -35,4 +35,5 @@ public:
 	int disconnect();///Disconnects user from database
 	DatabaseConnect(std::string, std::string, std::string, std::string);///User specifies credentials for connecting to database: database name, host ip address, username, password
 	DatabaseConnect();///Initialzes DatabaseConnect class with default values(non-functioning)
+	void db_test();
 };
