@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 	}
 	DatabaseConnect db;
 	std::string table_name = argv[1];
-	//std::cout << table_name << std::endl;
+	std::cout << table_name << std::endl;
 
 	//Custom data structures (See PcapParse.hpp)
 	str_vector current_files;
@@ -40,14 +40,14 @@ int main(int argc, char *argv[]) {
 	//std::cout << "The next key is: " << next_key << std::endl;
 
 	/*****************************************************/
-	const std::string path("/home/franku/PiPcapCollector/data/"+data_path);
+	const std::string path("/root/PiPcapCollector/data/"+data_path);
 	/*****************************************************/
-	//std::cout << path << std::endl;
+	std::cout << path << std::endl;
 
 	current_files = get_current_files(path);
 
 	int temp=0;
-	while(temp) {
+	while(1) {
 		for(auto& file_iter: current_files) {
 			Tins::FileSniffer sniffer(file_iter);
 			std::cout << "Analyzing: " << file_iter << std::endl;
