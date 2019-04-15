@@ -11,7 +11,7 @@
 
 void help(char *prog_name) {
 	std::cout << "Usage:\n\t" << prog_name << " database_table_name folder_to_store_data" << std::endl;
-	std::cout << "Examples:\n\t" << prog_name << " 5pi-mon3 mon" << std::endl;
+	std::cout << "Examples:\n\t" << prog_name << " 5pi_mon3 mon" << std::endl;
 	std::cout << "\t" << prog_name << " 5pi_sat4 sat" << std::endl;
 }
 
@@ -40,7 +40,8 @@ int main(int argc, char *argv[]) {
 	//std::cout << "The next key is: " << next_key << std::endl;
 
 	/*****************************************************/
-	const std::string path("/root/PiPcapCollector/data/"+data_path);
+	//const std::string path("/home/PiPcapCollector/data/"+data_path);
+	const std::string path("/home/franku/PiPcapCollector/pcap_files/");
 	/*****************************************************/
 	std::cout << path << std::endl;
 
@@ -98,15 +99,18 @@ int main(int argc, char *argv[]) {
 			//std::cout << "Timestamp: "<< pkt_stats.TimeStamp << std::endl;
 			str_vector upload = {std::to_string(pkt_stats.TimeStamp), std::to_string(pkt_stats.NumUsers), std::to_string(pkt_stats.NumBits), std::to_string(pkt_stats.NumPkts), std::to_string(pkt_stats.AvgSigS), std::to_string(pkt_stats.AvgDataRate), std::to_string(pkt_stats.BitsA), std::to_string(pkt_stats.BitsN)};
 
+			/*
 			db.connect();
 			db.deleteTableContent(table_name);
 			next_key = db.getNextKey(table_name);
 			db.writeData5GHz(table_name, std::to_string(next_key), upload);
 			db.disconnect();
 			std::cout << "Next key: " << next_key << std::endl;
+			*/
 			usleep(500);
 		}
-		current_files = get_current_files(path);
+		rm_current_files(current_files);
+		//current_files = get_current_files(path);
 	}
 
 	return 0;

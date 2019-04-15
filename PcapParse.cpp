@@ -18,11 +18,24 @@ str_vector get_current_files(std::string path) {
 		}
 	}
 	if(temp.empty()) {
+		std::cout << "Waiting...\n";
 		usleep(1000000);
 		get_current_files(path);
 	}
 	else {
 		return temp;
+	}
+}
+
+void rm_current_files(str_vector data) {
+	for(auto& d: data) {
+		//std::cout << d << std::endl;
+		if(remove(d.c_str()) != 0) {
+			perror("Error deleting file!\n");
+		}
+		else {
+			std::cout << "Removed: " << d << std::endl;
+		}
 	}
 }
 

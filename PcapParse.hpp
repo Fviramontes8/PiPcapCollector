@@ -35,6 +35,7 @@ typedef std::vector<std::string> str_vector;
 
 //Function prototypes
 str_vector get_current_files(std::string path);
+void rm_current_files(str_vector data);
 
 mac_info get_mac_info(const Tins::PDU &pkt_pdu, Tins::Packet input_pkt, mac_info input_mac);
 
