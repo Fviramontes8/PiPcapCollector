@@ -1,11 +1,7 @@
 #!/bin/bash
 
 #Installing necessary packages
-sudo apt-get install libtins-dev libpcap-dev libssl-dev libboost-all-dev libpq-dev
-
-echo "Cleaning, then compiling parser..."
-make clean
-make
+#sudo apt install libtins-dev libpcap-dev libssl-dev libboost-all-dev libpq-dev
 
 echo "Parser is ready!"
 if [ ! -d ./data ] ; then
